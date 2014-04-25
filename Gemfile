@@ -7,15 +7,19 @@ gem 'rails', '4.1.0'
 gem 'bcrypt-ruby', '3.1.2'
 group :development, :test do
   gem 'sqlite3', '1.3.8'
-  gem 'rspec-rails', '2.13.1'
+  gem 'rspec-rails', '~> 3.0.0.beta'
+  gem 'rspec-its', '~> 1.0.0.pre'
 end
 
+gem 'faker', '1.3'
 gem 'bootstrap-sass', '2.3.2.0'
 gem 'sprockets', '2.11.0'
+gem 'will_paginate', '3.0.4'
+gem 'bootstrap-will_paginate', '0.0.9'
 
 group :test do
   gem 'selenium-webdriver', '2.35.1'
-  gem 'capybara', '2.1.0'
+  gem 'capybara', '>= 2.2.0'
   gem 'factory_girl_rails', '4.2.1'
 end
 # Use SCSS for stylesheets
