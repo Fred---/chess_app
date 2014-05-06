@@ -2,13 +2,44 @@
 <h1>Chess Playground</h1>
 <div id="playground">
 
-    <script src="../chess.js"></script>
-    <div id="board" style="width: 600px"></div>
-    <p>Status: <span id="status"></span></p>
-    <p>PGN: <span id="pgn"></span></p>
-    <p>FEN: <span id="fen"></span></p>
+  <div class="row">
+    <div class="span8">
+      <div id="board" style="width: 600px"></div>
+      <p>Status: <span id="status"></span></p>
+      <p>PGN: <span id="pgn"></span></p>
+      <p>FEN: <span id="fen"></span></p>
+    </div>
+
+    <div class="span4">
+      <div id="chat" class="well"
+      data-uri="<%= request.host %>:<%= request.port %>/websocket">
+      </div>
+
+      <div class="form-inline well">
+        <fieldset>
+          <input type="text" class="input-xlarge" id="message">
+          <button id="send" class="btn btn-primary">Send</button>
+        </fieldset>
+      </div>
+      <div class="well sidebar-nav">
+        <h3>Users</h3>
+        <ul class="nav nav-list" id="user-list">
+          <li class="nav-header"></li>
+        </ul>
+      </div>
+      <div class="well sidebar-nav">
+        <h3>Challenges</h3>
+        <ul class="nav nav-list" id="challenge-list">
+          <li class="nav-header"></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
 
     <script type="text/javascript">
+
+
         var board,
           game = new Chess(),
           statusEl = $('#status'),
@@ -89,6 +120,9 @@
         board = new ChessBoard('board', cfg);
 
         updateStatus();
+
+        window.user_id = <%= @user.id %>;
+        window.user_name = "<%= @user.name %>";
     </script>
 </div>
 

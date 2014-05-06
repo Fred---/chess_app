@@ -16,6 +16,7 @@ class StaticPagesController < ApplicationController
   end
 
   def chess
+    @user = current_user
   end
 
 end
