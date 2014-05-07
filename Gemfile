@@ -10,6 +10,7 @@ group :development, :test do
   gem 'sqlite3', '1.3.8'
   gem 'rspec-rails', '~> 3.0.0.beta'
   gem 'rspec-its', '~> 1.0.0.pre'
+  gem 'rails-erd'
 end
 
 gem 'faker', '1.3'

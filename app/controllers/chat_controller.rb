@@ -32,11 +32,6 @@ class ChatController < WebsocketRails::BaseController
     user_msg :new_message, message[:msg_body].dup
   end
   
-  def change_username
-    connection_store[:user][:user_name] = sanitize(message[:user_name])
-    broadcast_user_list
-  end
-  
   def delete_user
     @user = current_user
     connection_store[:user] = nil
@@ -45,7 +40,13 @@ class ChatController < WebsocketRails::BaseController
   end
   
   def broadcast_user_list
-    users = connection_store.collect_all(:user)
+    users_temp = connection_store.collect_all(:user)
+    users = []
+    users_temp.each do |i|
+      if !users.include?(i)
+        users.push(i)
+      end
+    end
     broadcast_message :user_list, users
   end
 end

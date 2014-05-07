@@ -6,7 +6,27 @@ window.Chat = {}
 $(document).on "click", ".user_item", ->
   chatController.dispatcher.trigger 'challenge_user', {msg_body: $(this).attr('data-user_id')}
   return
+
+$(document).on "click", ".challenge", ->
+  chatController.dispatcher.trigger 'challenge_accepted', {
+    user_id: user_id, 
+    challenger_id: $(this).attr('data-user_id')
+  }
+  return
+
+
 class Chat.Controller
+  challengeTemplate: (message) ->
+    html =
+      """
+      <div class="challenge" data-user_id= #{message.user_id}>
+      <label class="label label-info">
+        #{message.user_name}
+      </label>
+      </div>
+      """
+    $(html)
+
   template: (message) ->
     html =
       """
@@ -71,9 +91,9 @@ class Chat.Controller
       $(this).remove()
 
   updateChallengeList: (message) =>
-    messageTemplate = @template(message)
-    $('#challenge-list').append messageTemplate
+    if message.user_name != user_name
+      messageTemplate = @challengeTemplate(message)
+      $('#challenge-list').append messageTemplate
 
   chessPlay: (message) =>
-    alert message
 

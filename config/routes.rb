@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :games
+
   get 'users/new'
   resources :users do
     member do
