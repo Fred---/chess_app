@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   
-  has_many :users_games, foreign_key: "user_id"
-  has_many :games, through: :users_games, source: :user
+  has_many :user_games
+  has_many :games, through: :user_games
   has_many :microposts, dependent: :destroy
   has_many :relationships, foreign_key: "follower_id", dependent: :destroy
   has_many :followed_users, through: :relationships, source: :followed

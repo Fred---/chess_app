@@ -62,7 +62,8 @@ class Chat.Controller
     @dispatcher.bind 'new_message', @newMessage
     @dispatcher.bind 'user_list', @updateUserList
     @dispatcher.bind 'challenge', @updateChallengeList
-    @channel.bind 'info', @chessPlay
+    @channel.bind 'game_start', @chessPlay
+    @channel.bind 'game_move', @gameMove
     $('#send').on 'click', @sendMessage
     $('#message').keypress (e) -> $('#send').click() if e.keyCode == 13
 
@@ -96,4 +97,80 @@ class Chat.Controller
       $('#challenge-list').append messageTemplate
 
   chessPlay: (message) =>
+    window.game = new Chess()
+    window.game_id = message.game_id
+    statusEl = $("#status")
+    fenEl = $("#fen")
+    pgnEl = $("#pgn")
 
+    # do not pick up pieces if the game is over
+    # only pick up pieces for the side to move
+    onDragStart = (source, piece, position, orientation) ->
+      false  if game.game_over() is true or (game.turn() is "w" and piece.search(/^b/) isnt -1) or (game.turn() is "b" and piece.search(/^w/) isnt -1) or (orientation is "white" and piece.search(/^w/) is -1) or (orientation is "black" and piece.search(/^b/) is -1)
+
+    onDrop = (source, target) ->
+      
+      # see if the move is legal
+      move = game.move(
+        from: source
+        to: target
+        promotion: "q" # NOTE: always promote to a queen for example simplicity
+      )
+      
+      # illegal move
+      return "snapback"  if move is null
+      updateStatus()
+      return
+
+
+    # update the board position after the piece snap 
+    # for castling, en passant, pawn promotion
+    onSnapEnd = ->
+      board.position game.fen()
+      moveColor = "white"
+      moveColor = "black"  if game.turn() is "b"
+      chatController.dispatcher.trigger 'game_move', {user_id: user_id, game_id: game_id, fen: game.fen(), pgn: game.pgn(), turn: moveColor}
+      return
+
+    updateStatus = ->
+      status = ""
+      moveColor = "White"
+      moveColor = "Black"  if game.turn() is "b"
+      
+      # checkmate?
+      if game.in_checkmate() is true
+        status = "Game over, " + moveColor + " is in checkmate."
+      
+      # draw?
+      else if game.in_draw() is true
+        status = "Game over, drawn position"
+      
+      # game still on
+      else
+        status = moveColor + " to move"
+        
+        # check?
+        status += ", " + moveColor + " is in check"  if game.in_check() is true
+      statusEl.html status
+      fenEl.html game.fen()
+      pgnEl.html game.pgn()
+      return
+
+    cfg =
+      draggable: true
+      pieceTheme: "../images/chesspieces/wikipedia/{piece}.png"
+      position: "start"
+      onDragStart: onDragStart
+      onDrop: onDrop
+      onSnapEnd: onSnapEnd
+      moveSpeed: 'slow'
+      snapbackSpeed: 500
+      snapSpeed: 100
+      orientation: message.colour
+
+    board = new ChessBoard("board", cfg)
+    updateStatus()
+
+
+  gameMove: (message) =>
+    board.position(message.fen)
