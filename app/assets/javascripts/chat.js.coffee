@@ -32,7 +32,7 @@ class Chat.Controller
       """
       <div class="message" >
       <label class="label label-info">
-      [#{message.received}] #{message.user_name}
+      #{message.received} #{message.user_name}
       </label>&nbsp;
       #{message.msg_body}
       </div>
@@ -99,9 +99,7 @@ class Chat.Controller
   chessPlay: (message) =>
     window.game = new Chess()
     window.game_id = message.game_id
-    statusEl = $("#status")
-    fenEl = $("#fen")
-    pgnEl = $("#pgn")
+
 
     # do not pick up pieces if the game is over
     # only pick up pieces for the side to move
@@ -119,41 +117,14 @@ class Chat.Controller
       
       # illegal move
       return "snapback"  if move is null
-      updateStatus()
+      chatController.dispatcher.trigger 'game_move', {game_id: game_id, pgn: game.pgn(), turn: game.turn(), move: move}
+      chatController.updateStatus()
       return
-
 
     # update the board position after the piece snap 
     # for castling, en passant, pawn promotion
     onSnapEnd = ->
       board.position game.fen()
-      moveColor = "white"
-      moveColor = "black"  if game.turn() is "b"
-      chatController.dispatcher.trigger 'game_move', {user_id: user_id, game_id: game_id, fen: game.fen(), pgn: game.pgn(), turn: moveColor}
-      return
-
-    updateStatus = ->
-      status = ""
-      moveColor = "White"
-      moveColor = "Black"  if game.turn() is "b"
-      
-      # checkmate?
-      if game.in_checkmate() is true
-        status = "Game over, " + moveColor + " is in checkmate."
-      
-      # draw?
-      else if game.in_draw() is true
-        status = "Game over, drawn position"
-      
-      # game still on
-      else
-        status = moveColor + " to move"
-        
-        # check?
-        status += ", " + moveColor + " is in check"  if game.in_check() is true
-      statusEl.html status
-      fenEl.html game.fen()
-      pgnEl.html game.pgn()
       return
 
     cfg =
@@ -168,9 +139,41 @@ class Chat.Controller
       snapSpeed: 100
       orientation: message.colour
 
-    board = new ChessBoard("board", cfg)
-    updateStatus()
+    window.board = new ChessBoard("board", cfg)
+    @updateStatus()
 
 
   gameMove: (message) =>
-    board.position(message.fen)
+    game.move message.move
+    board.position game.fen()
+    chatController.updateStatus()
+    if game.in_checkmate() is true
+      chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "checkmate"}
+    else if game.in_draw() is true
+      chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "drawn"}
+      
+  updateStatus: =>
+    status = ""
+    state = "on going"
+    moveColor = "White"
+    moveColor = "Black"  if game.turn() is "b"
+      
+    # checkmate?
+    if game.in_checkmate() is true
+      state = "checkmate"
+      status = "Game over, " + moveColor + " is in checkmate."
+    # draw?
+    else if game.in_draw() is true
+      state = "drawn"
+      status = "Game over, drawn position"
+    # game still on
+    else
+      status = moveColor + " to move"
+      state = "on going"
+        
+      # check?
+      status += ", " + moveColor + " is in check"  if game.in_check() is true
+    $("#status").html status
+    $("#fen").html game.fen()
+    $("#pgn").html game.pgn()
+    return state

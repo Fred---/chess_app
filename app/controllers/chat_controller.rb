@@ -8,7 +8,7 @@ class ChatController < WebsocketRails::BaseController
   def system_msg(ev, msg)
     broadcast_message ev, {
       user_name: 'system',
-      received: Time.now.to_s(:short),
+      received: Time.now.strftime('%H:%M'),
       msg_body: msg
     }
   end
@@ -16,7 +16,7 @@ class ChatController < WebsocketRails::BaseController
   def user_msg(ev, msg)
     broadcast_message ev, {
       user_name: connection_store[:user][:user_name],
-      received: Time.now.to_s(:short),
+      received: Time.now.strftime('%H:%M'),
       msg_body: ERB::Util.html_escape(msg)
       }
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140510154955) do
+ActiveRecord::Schema.define(version: 20140514112503) do
 
   create_table "games", force: true do |t|
     t.string   "pgn"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20140510154955) do
     t.string   "colour"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "result"
   end
 
   create_table "users", force: true do |t|
