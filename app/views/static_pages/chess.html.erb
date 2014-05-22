@@ -20,13 +20,18 @@
       </div>
     </div>
 
-    <div class="col-md-3 sidebar scrollable" id="chat_info">
+    <div class="col-md-3" id="chat_info">
       <div class="row">
-        <div class="panel panel-default">
-          <div class="panel-heading">Challenges</div>
-          <div class="panel-body" id="challenge-list"></div>
+        <div class="panel panel-default" id="challenge_box">
+          <div class="panel-heading">
+            <a>Challenges</a>
+            <button class="btn btn-sm btn-info" type="button" id="send_challenge">broadcast</button>
+          </div>
+          <div class="panel-content">
+            <ul class="list-group scrollable" id="challenge-list">
+          </ul>
+          </div>
         </div>
-
         <div class="panel panel-default">
           <div class="panel-heading">Users connected</div>
           <table class="table" id="user-list"></table>

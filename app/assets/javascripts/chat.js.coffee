@@ -3,11 +3,11 @@ jQuery ->
 
 window.Chat = {}
 
-$(document).on "click", ".user_item", ->
-  chatController.dispatcher.trigger 'challenge_user', {msg_body: $(this).attr('data-user_id')}
+$(document).on "click", "#send_challenge", ->
+  chatController.dispatcher.trigger 'challenge_user', {msg_body: "hello"}
   return
 
-$(document).on "click", ".challenge", ->
+$(document).on "click", ".challenge_button", ->
   chatController.dispatcher.trigger 'challenge_accepted', {
     user_id: user_id, 
     challenger_id: $(this).attr('data-user_id')
@@ -16,15 +16,19 @@ $(document).on "click", ".challenge", ->
 
 
 class Chat.Controller
-  challengeTemplate: (message) ->
-    html =
-      """
-      <div class="challenge" data-user_id= #{message.user_id}>
-      <label class="label label-info">
-        #{message.user_name}
-      </label>
-      </div>
-      """
+  challengeListTemplate: (challengeList) ->
+    html = ""
+    for challenge in challengeList
+      if challenge.user_id != user_id
+        html = html + 
+        """
+        <li class="list-group-item challenge_item" >
+          #{challenge.user_name}
+        <button type="button" class="btn btn-sm btn-primary challenge_button" data-user_id= #{challenge.user_id}>
+         accept
+        </button>
+        </li>
+        """
     $(html)
 
   template: (message) ->
@@ -45,7 +49,7 @@ class Chat.Controller
       userHtml = userHtml + 
       """
       <div>
-        <a class="user_item" data-user_id= #{user.id}>
+        <a class="user_item" data-user_id= #{user.user_id}>
         #{user.user_name}
         </a>
       </div>
@@ -77,7 +81,7 @@ class Chat.Controller
   bindEvents: =>
     @dispatcher.bind 'new_message', @newMessage
     @dispatcher.bind 'user_list', @updateUserList
-    @dispatcher.bind 'challenge', @updateChallengeList
+    @dispatcher.bind 'challenge_list', @updateChallengeList
     @channel.bind 'game_start', @gameStart
     @channel.bind 'game_move', @gameMove
     $('#send').on 'click', @sendMessage
@@ -107,10 +111,8 @@ class Chat.Controller
     $('#chat div.messages:first').slideDown 100, ->
       $(this).remove()
 
-  updateChallengeList: (message) =>
-    if message.user_name != user_name
-      messageTemplate = @challengeTemplate(message)
-      $('#challenge-list').append messageTemplate
+  updateChallengeList: (challengeList) =>
+    $('#challenge-list').html @challengeListTemplate(challengeList)
 
   gameStart: (message) =>
     window.game = new Chess()
@@ -158,6 +160,7 @@ class Chat.Controller
     window.board = new ChessBoard("board", cfg)
 
     @updateStatus()
+    chatController.dispatcher.trigger 'game_started', {game_id: game_id, user_id: user_id}
     $("#opponent").html message.opponent_name
 
   gameMove: (message) =>

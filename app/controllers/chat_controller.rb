@@ -24,8 +24,9 @@ class ChatController < WebsocketRails::BaseController
   def client_connected
     @user = current_user
     system_msg :new_message, @user.name + " connected"
-    connection_store[:user] = { user_name: @user.name, id: @user.id }
+    connection_store[:user] = { user_name: @user.name, user_id: @user.id, status: "free" }
     broadcast_user_list
+    broadcast_challenge_list
   end
   
   def new_message
@@ -37,6 +38,7 @@ class ChatController < WebsocketRails::BaseController
     connection_store[:user] = nil
     system_msg "client disconnected"
     broadcast_user_list
+    broadcast_challenge_list
   end
   
   def broadcast_user_list
@@ -49,4 +51,17 @@ class ChatController < WebsocketRails::BaseController
     end
     broadcast_message :user_list, users
   end
+
+  def broadcast_challenge_list
+    challenges_temp = connection_store.collect_all(:user)
+      challenges = []
+      challenges_temp.each do |i|
+        if i[:status] == "challenger"
+          challenges.push(i)
+        end
+      end
+      broadcast_message :challenge_list, challenges
+  end
+
+
 end

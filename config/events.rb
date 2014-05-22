@@ -36,6 +36,8 @@ WebsocketRails::EventMap.describe do
   subscribe :connetion_closed, to: ChatController, with_method: :delete_user
   subscribe :challenge_user, to: ChessController, with_method: :challenge
   subscribe :challenge_accepted, to: ChessController, with_method: :challenge_accepted
+  subscribe :game_started, to: ChessController, with_method: :game_started
   subscribe :game_move, to: ChessController, with_method: :game_move
   subscribe :game_over, to: ChessController, with_method: :game_over
+
 end

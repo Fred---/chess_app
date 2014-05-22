@@ -4,20 +4,29 @@ class ChessController < WebsocketRails::BaseController
   def system_msg(ev, msg)
     broadcast_message ev, {
       user_name: 'system',
-      received: Time.now.to_s(:short),
+      received: Time.now.strftime('%H:%M'),
       msg_body: msg
     }
   end
 
   def challenge
-    @user = current_user
-    broadcast_message :challenge, { 
-      user_name: @user.name,
-      user_id: @user.id,
-    }
+    connection_store[:user][:status] = "challenger"
+    broadcast_challenge_list
+  end
+
+  def broadcast_challenge_list
+    challenges_temp = connection_store.collect_all(:user)
+      challenges = []
+      challenges_temp.each do |i|
+        if i[:status] == "challenger"
+          challenges.push(i)
+        end
+      end
+      broadcast_message :challenge_list, challenges
   end
 
   def challenge_accepted
+    connection_store[:user][:status] = "busy"
     user1 = current_user
     channel1 = user1.name.to_s + user1.id.to_s
     user2 = User.find(message[:challenger_id])
@@ -52,6 +61,11 @@ class ChessController < WebsocketRails::BaseController
       opponent_id: user1.id,
       opponent_name: user1.name
     })
+  end
+
+  def game_started
+    connection_store[:user][:status] = "busy"
+    broadcast_challenge_list
   end
 
   def game_move
@@ -92,5 +106,6 @@ class ChessController < WebsocketRails::BaseController
       user_games.second.result = "Lost"
       user_games.second.save
     end
+    connection_store[:user][:status] = "free"
   end
 end
