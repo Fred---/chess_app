@@ -14,7 +14,6 @@ class ChessController < WebsocketRails::BaseController
     broadcast_message :challenge, { 
       user_name: @user.name,
       user_id: @user.id,
-      msg_body: 'hello'
     }
   end
 
@@ -43,11 +42,15 @@ class ChessController < WebsocketRails::BaseController
     #envoie de Game_id et de la couleur à chaque joueur
     WebsocketRails[channel1].trigger(:game_start, {
       game_id: g.id.to_s,
-      colour: user1_colour
+      colour: user1_colour,
+      opponent_id: user2.id,
+      opponent_name: user2.name
     })
     WebsocketRails[channel2].trigger(:game_start, {
       game_id: g.id.to_s,
-      colour: user2_colour
+      colour: user2_colour,
+      opponent_id: user1.id,
+      opponent_name: user1.name
     })
   end
 

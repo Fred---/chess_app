@@ -52,6 +52,22 @@ class Chat.Controller
         """
     $(userHtml)
 
+  pgnTemplate: (pgn) ->
+    html = ""
+    for move in pgn
+      line = move.split(" ")
+      if typeof line[1] != 'undefined'
+        line[2] = "--" unless typeof line[2] != 'undefined'
+        html = html + 
+        """
+        <tr>
+          <td>#{line[0]}</td>
+          <td>#{line[1]}</td>
+          <td>#{line[2]}</td>
+        </tr>
+        """
+    $(html)
+
   constructor: (url,useWebSockets) ->
     @messageQueue = []
     @dispatcher = new WebSocketRails(url,useWebSockets)
@@ -62,7 +78,7 @@ class Chat.Controller
     @dispatcher.bind 'new_message', @newMessage
     @dispatcher.bind 'user_list', @updateUserList
     @dispatcher.bind 'challenge', @updateChallengeList
-    @channel.bind 'game_start', @chessPlay
+    @channel.bind 'game_start', @gameStart
     @channel.bind 'game_move', @gameMove
     $('#send').on 'click', @sendMessage
     $('#message').keypress (e) -> $('#send').click() if e.keyCode == 13
@@ -96,7 +112,7 @@ class Chat.Controller
       messageTemplate = @challengeTemplate(message)
       $('#challenge-list').append messageTemplate
 
-  chessPlay: (message) =>
+  gameStart: (message) =>
     window.game = new Chess()
     window.game_id = message.game_id
 
@@ -140,8 +156,9 @@ class Chat.Controller
       orientation: message.colour
 
     window.board = new ChessBoard("board", cfg)
-    @updateStatus()
 
+    @updateStatus()
+    $("#opponent").html message.opponent_name
 
   gameMove: (message) =>
     game.move message.move
@@ -173,7 +190,10 @@ class Chat.Controller
         
       # check?
       status += ", " + moveColor + " is in check"  if game.in_check() is true
+    #update pgn box
+    pgn = game.pgn({ max_width: 5, newline_char: '$' })
+    pgn = pgn.split("$")
+    $("#game_pgn").html @pgnTemplate(pgn)
+
     $("#status").html status
-    $("#fen").html game.fen()
-    $("#pgn").html game.pgn()
     return state
