@@ -32,25 +32,27 @@
 		    	chess_game.load_pgn(pgn);
 		    	window.fens = new Array();
 		    	fens.push(chess_game.fen());
-		    	window.n = 0
-		      window.board = new ChessBoard('board_view', {
-		        draggable: false,
-		        ropOffBoard: 'trash',
-		        position: chess_game.fen(),
-		        pieceTheme: '../images/chesspieces/wikipedia/{piece}.png',
-		      });
+		      	window.board = new ChessBoard('board_view', {
+			        draggable: false,
+			        ropOffBoard: 'trash',
+			        position: chess_game.fen(),
+			        pieceTheme: '../images/chesspieces/wikipedia/{piece}.png',
+			      });
 		      $(window).resize(board.resize);
+
 		      $(document).on("click", "#back_button", function() {
 		      	chess_game.undo();
 		      	board.position(chess_game.fen());
 		      	fens.push(chess_game.fen());
 				});
+
 		      $(document).on("click", "#forward_button", function() {
 		      	if (fens.length > 0) {
 			      	fens.pop();
 			      	board.position(fens[fens.length - 1]);
-					});
-		      	};
+					};
+		      	});
+
 		      $(document).on("click", "#refresh_button", function() {
 		      	chess_game.load_pgn(pgn);
 		      	board.position(chess_game.fen());
