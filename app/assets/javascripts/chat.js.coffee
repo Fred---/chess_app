@@ -11,7 +11,7 @@ $(document).on "click", ".challenge_button", (e) ->
   e.preventDefault()
   chatController.dispatcher.trigger 'challenge_accepted', {
     user_id: user_id, 
-    challenger_id: 42
+    challenger_id: "42"
   }
   return
 
