@@ -1,24 +1,63 @@
-<p id="notice"><%= notice %></p>
+<div class="row">
+    <div class="col-md-7 main" id="board_view">
+    </div>
+	<div class="col-md-5 main">
+		<p>
+		  <strong>Pgn:</strong>
+		  <div id="pgn"> <%= @game.pgn %> </div>
+		</p>
 
-<p>
-  <strong>Pgn:</strong>
-  <%= @game.pgn %>
-</p>
+		<p>
+		  <strong>Start time:</strong>
+		  <%= @game.start_time %>
+		</p>
 
-<p>
-  <strong>Start time:</strong>
-  <%= @game.start_time %>
-</p>
+		<p>
+		  <strong>End time:</strong>
+		  <%= @game.end_time %>
+		</p>
 
-<p>
-  <strong>End time:</strong>
-  <%= @game.end_time %>
-</p>
+		<p>
+		  <strong>Status:</strong>
+		  <%= @game.status %>
+		</p>
+		<div class="box">
+			<button type="button" class="btn btn-primary glyphicon glyphicon-chevron-left" id="back_button"></button>
+			<button type="button" class="btn btn-primary glyphicon glyphicon-refresh" id="refresh_button"></button>
+			<button type="button" class="btn btn-primary glyphicon glyphicon-chevron-right" id="forward_button"></button>
+		</div>
+		<script type="text/javascript">
+		    	window.chess_game = new Chess();
+		    	window.pgn = $("#pgn").html();
+		    	chess_game.load_pgn(pgn);
+		    	window.fens = new Array();
+		    	fens.push(chess_game.fen());
+		    	window.n = 0
+		      window.board = new ChessBoard('board_view', {
+		        draggable: false,
+		        ropOffBoard: 'trash',
+		        position: chess_game.fen(),
+		        pieceTheme: '../images/chesspieces/wikipedia/{piece}.png',
+		      });
+		      $(window).resize(board.resize);
+		      $(document).on("click", "#back_button", function() {
+		      	chess_game.undo();
+		      	board.position(chess_game.fen());
+		      	fens.push(chess_game.fen());
+				});
+		      $(document).on("click", "#forward_button", function() {
+		      	if (fens.length > 0) {
+			      	fens.pop();
+			      	board.position(fens[fens.length - 1]);
+					});
+		      	};
+		      $(document).on("click", "#refresh_button", function() {
+		      	chess_game.load_pgn(pgn);
+		      	board.position(chess_game.fen());
+				});
+		</script>
 
-<p>
-  <strong>Status:</strong>
-  <%= @game.status %>
-</p>
-
-<%= link_to 'Edit', edit_game_path(@game) %> |
-<%= link_to 'Back', games_path %>
+		<%= link_to 'Edit', edit_game_path(@game) %> |
+		<%= link_to 'Back', games_path %>
+	</div>
+</div>

@@ -1,0 +1,28 @@
+    <div class="col-md-3" id="chat_info">
+      <div class="row">
+        <div class="panel panel-default" id="challenge_box">
+          <div class="panel-heading">
+            <a>Challenges</a>
+            <button class="btn btn-sm btn-info" type="button" id="send_challenge">broadcast</button>
+          </div>
+          <div class="panel-content">
+            <ul class="list-group scrollable" id="challenge-list">
+          </ul>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">Users connected</div>
+          <table class="table" id="user-list"></table>
+        </div>
+
+        <div id="chat" class="well scrollable" data-uri="<%= request.host %>:<%= request.port %>/websocket">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" id="send">Send</button>
+            </span>
+            <input type="text" class="form-control" id="message">
+        </div>
+      </div>
+    </div>

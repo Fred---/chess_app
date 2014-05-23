@@ -7,14 +7,14 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <%= link_to "sample app", root_path, id: "logo" %>
+      <%= link_to "chess playground", root_path, id: "logo" %>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav pull-right navbar-nav">
           <li><%= link_to "Home", root_path %></li>
-          <li><%= link_to "Chess", chess_path %></li>
           <% if signed_in? %>
+            <li><%= link_to "Games", games_path %></li>
             <li><%= link_to "Users", users_path %></li>
             <li id="fat-menu" class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
