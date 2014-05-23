@@ -9,10 +9,8 @@ $(document).on "click", "#send_challenge", ->
 
 $(document).on "click", ".challenge_button", (e) ->
   e.preventDefault()
-  chatController.dispatcher.trigger 'challenge_accepted', {
-    user_id: user_id, 
-    challenger_id: "42"
-  }
+  alert $(this).data('user_id')
+  alert 2
   return
 
 
