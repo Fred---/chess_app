@@ -75,15 +75,14 @@ class Chat.Controller
   constructor: (url,useWebSockets) ->
     @messageQueue = []
     @dispatcher = new WebSocketRails(url,useWebSockets)
-    @channel = @dispatcher.subscribe("#{user_name}" + "#{user_id}")
     @bindEvents()
 
   bindEvents: =>
     @dispatcher.bind 'new_message', @newMessage
     @dispatcher.bind 'user_list', @updateUserList
     @dispatcher.bind 'challenge_list', @updateChallengeList
-    @channel.bind 'game_start', @gameStart
-    @channel.bind 'game_move', @gameMove
+    @dispatcher.bind 'game_start', @gameStart
+    @dispatcher.bind 'game_move', @gameMove
     $('#send').on 'click', @sendMessage
     $('#message').keypress (e) -> $('#send').click() if e.keyCode == 13
 
@@ -115,62 +114,59 @@ class Chat.Controller
     $('#challenge-list').html @challengeListTemplate(challengeList)
 
   gameStart: (message) =>
-    window.game = new Chess()
-    window.game_id = message.game_id
+    if message.user_id == user_id
+      window.game = new Chess()
+      window.game_id = message.game_id
+      # do not pick up pieces if the game is over
+      # only pick up pieces for the side to move
+      onDragStart = (source, piece, position, orientation) ->
+        false  if game.game_over() is true or (game.turn() is "w" and piece.search(/^b/) isnt -1) or (game.turn() is "b" and piece.search(/^w/) isnt -1) or (orientation is "white" and piece.search(/^w/) is -1) or (orientation is "black" and piece.search(/^b/) is -1)
 
+      onDrop = (source, target) ->
+        # see if the move is legal
+        move = game.move(
+          from: source
+          to: target
+          promotion: "q" # NOTE: always promote to a queen for example simplicity
+        )
+        # illegal move
+        return "snapback"  if move is null
+        chatController.dispatcher.trigger 'game_move', {game_id: game_id, pgn: game.pgn(), turn: game.turn(), move: move}
+        chatController.updateStatus()
+        return
+      # update the board position after the piece snap 
+      # for castling, en passant, pawn promotion
+      onSnapEnd = ->
+        board.position game.fen()
+        return
 
-    # do not pick up pieces if the game is over
-    # only pick up pieces for the side to move
-    onDragStart = (source, piece, position, orientation) ->
-      false  if game.game_over() is true or (game.turn() is "w" and piece.search(/^b/) isnt -1) or (game.turn() is "b" and piece.search(/^w/) isnt -1) or (orientation is "white" and piece.search(/^w/) is -1) or (orientation is "black" and piece.search(/^b/) is -1)
+      cfg =
+        draggable: true
+        pieceTheme: "../images/chesspieces/wikipedia/{piece}.png"
+        position: "start"
+        onDragStart: onDragStart
+        onDrop: onDrop
+        onSnapEnd: onSnapEnd
+        moveSpeed: 'slow'
+        snapbackSpeed: 500
+        snapSpeed: 100
+        orientation: message.colour
 
-    onDrop = (source, target) ->
-      
-      # see if the move is legal
-      move = game.move(
-        from: source
-        to: target
-        promotion: "q" # NOTE: always promote to a queen for example simplicity
-      )
-      
-      # illegal move
-      return "snapback"  if move is null
-      chatController.dispatcher.trigger 'game_move', {game_id: game_id, pgn: game.pgn(), turn: game.turn(), move: move}
-      chatController.updateStatus()
-      return
+      window.board = new ChessBoard("board", cfg)
 
-    # update the board position after the piece snap 
-    # for castling, en passant, pawn promotion
-    onSnapEnd = ->
-      board.position game.fen()
-      return
-
-    cfg =
-      draggable: true
-      pieceTheme: "../images/chesspieces/wikipedia/{piece}.png"
-      position: "start"
-      onDragStart: onDragStart
-      onDrop: onDrop
-      onSnapEnd: onSnapEnd
-      moveSpeed: 'slow'
-      snapbackSpeed: 500
-      snapSpeed: 100
-      orientation: message.colour
-
-    window.board = new ChessBoard("board", cfg)
-
-    @updateStatus()
-    chatController.dispatcher.trigger 'game_started', {game_id: game_id, user_id: user_id}
-    $("#opponent").html message.opponent_name
+      @updateStatus()
+      chatController.dispatcher.trigger 'game_started', {game_id: game_id, user_id: user_id}
+      $("#opponent").html message.opponent_name
 
   gameMove: (message) =>
-    game.move message.move
-    board.position game.fen()
-    chatController.updateStatus()
-    if game.in_checkmate() is true
-      chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "checkmate"}
-    else if game.in_draw() is true
-      chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "drawn"}
+    if message.user_id == user_id
+      game.move message.move
+      board.position game.fen()
+      chatController.updateStatus()
+      if game.in_checkmate() is true
+        chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "checkmate"}
+      else if game.in_draw() is true
+        chatController.dispatcher.trigger 'game_over', {game_id: game_id, pgn: game.pgn(), status: "drawn"}
       
   updateStatus: =>
     status = ""

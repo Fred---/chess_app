@@ -28,10 +28,7 @@ class ChessController < WebsocketRails::BaseController
   def challenge_accepted
     connection_store[:user][:status] = "busy"
     user1 = current_user
-    channel1 = user1.name.to_s + user1.id.to_s
     user2 = User.find(message[:challenger_id])
-    channel2 = user2.name.to_s + user2.id.to_s
-
     g = Game.create(pgn: "", status: "on going")
 
     # affectation au hasard de la couleur
@@ -48,18 +45,20 @@ class ChessController < WebsocketRails::BaseController
     user2_game = UserGame.create(user_id: user2.id, game_id: g.id, colour: user2_colour, result: "")
 
     #envoie de Game_id et de la couleur à chaque joueur
-    WebsocketRails[channel1].trigger(:game_start, {
+    broadcast_message :game_start, {
       game_id: g.id.to_s,
       colour: user1_colour,
+      user_id: user1.id,
       opponent_id: user2.id,
       opponent_name: user2.name
-    })
-    WebsocketRails[channel2].trigger(:game_start, {
+    }
+    broadcast_message :game_start, {
       game_id: g.id.to_s,
       colour: user2_colour,
+      user_id: user2.id,
       opponent_id: user1.id,
       opponent_name: user1.name
-    })
+    }
   end
 
   def game_started
@@ -74,17 +73,16 @@ class ChessController < WebsocketRails::BaseController
     user_games = UserGame.where("game_id = :game_id", {game_id: message[:game_id]})
 
     if current_user.id == user_games.first.user_id
-      user2 = User.find(user_games.second.user_id)
+      opponent = User.find(user_games.second.user_id)
     else
-      user2 = User.find(user_games.first.user_id)
+      opponent = User.find(user_games.first.user_id)
     end
 
-    channel2 = user2.name.to_s + user2.id.to_s
-
-    WebsocketRails[channel2].trigger(:game_move, {
+    broadcast_message :game_move, {
       game_id: message[:game_id],
+      user_id: opponent.id,
       move: message[:move]
-    })
+    }
 
   end
 
