@@ -43,6 +43,8 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'jquery-turbolinks', '~> 2.0'
 
+  gem 'newrelic_rpm'
+
 group :doc do
   gem 'sdoc', '0.3.20', require: false
 end
@@ -53,6 +55,7 @@ gem 'spring',        group: :development
 group :production do
   gem 'pg', '0.15.1'
   gem 'rails_12factor', '0.0.2'
+
 end
 
 # Use ActiveModel has_secure_password
