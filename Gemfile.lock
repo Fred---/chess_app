@@ -228,10 +228,10 @@ DEPENDENCIES
   jquery-rails
   jquery-turbolinks (~> 2.0)
   newrelic_rpm
-  pg (= 0.15.1)
+  pg
   rails (= 4.1.0)
   rails-erd
-  rails_12factor (= 0.0.2)
+  rails_12factor
   rspec-its (~> 1.0.0.pre)
   rspec-rails (~> 3.0.0.beta)
   sass-rails (~> 4.0.3)
