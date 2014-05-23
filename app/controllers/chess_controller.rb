@@ -41,8 +41,7 @@ class ChessController < WebsocketRails::BaseController
       user2_colour="white"
     end 
     # Maj Join Table
-    user1_game = UserGame.create(user_id: user1.id, game_id: g.id, colour: user1_colour, result: "")
-    user2_game = UserGame.create(user_id: user2.id, game_id: g.id, colour: user2_colour, result: "")
+
 
     #envoie de Game_id et de la couleur à chaque joueur
     broadcast_message :game_start, {
