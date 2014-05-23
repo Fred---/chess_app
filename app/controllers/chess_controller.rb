@@ -33,7 +33,6 @@ class ChessController < WebsocketRails::BaseController
     channel2 = user2.name.to_s + user2.id.to_s
 
     g = Game.create(pgn: "", status: "on going")
-    system_msg :new_message, g.id
 
     # affectation au hasard de la couleur
     r=rand(2)
