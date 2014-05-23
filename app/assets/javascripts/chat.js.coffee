@@ -8,6 +8,7 @@ $(document).on "click", "#send_challenge", ->
   return
 
 $(document).on "click", ".challenge_button", ->
+  alert 2
   chatController.dispatcher.trigger 'challenge_accepted', {
     user_id: user_id, 
     challenger_id: $(this).attr('data-user_id')
