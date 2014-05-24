@@ -41,16 +41,16 @@
 		      $(window).resize(board.resize);
 
 		      $(document).on("click", "#back_button", function() {
-		      	chess_game.undo();
-		      	board.position(chess_game.fen());
-		      	fens.push(chess_game.fen());
+		      		chess_game.undo();
+		      		board.position(chess_game.fen());
+		      		fens.push(chess_game.fen());
 				});
-
 		      $(document).on("click", "#forward_button", function() {
 		      	if (fens.length > 0) {
-			      	fens.pop();
-			      	board.position(fens[fens.length - 1]);
-					};
+		      		fens.pop();
+		      		chess_game.move(fens[fens.length - 1])
+			      	board.position(chess_game.fen());
+			      };
 		      	});
 
 		      $(document).on("click", "#refresh_button", function() {
