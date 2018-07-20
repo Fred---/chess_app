@@ -15,4 +15,4 @@ I made it while lerning the basics of ruby on rails.
 * Account basic functionnalities
 
 
-🎡 Want to give it a try ? Have fun [here !](https://dashboard.heroku.com/apps/boiling-peak-3929) 
+🎡 Want to give it a try ? Have fun [here !](https://boiling-peak-3929.herokuapp.com) 
