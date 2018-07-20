@@ -1,28 +1,19 @@
-== README
+CHESS PLAYGROUND
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This source code is a simple web app for playing Chess in real time. 
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+I made it while lerning the basics of ruby on rails.
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Main features:
+* Broadcast a match request with connected users 
+* Play in real time
+* Chat
+* Review your games history
+* Account basic functionnalities
+
+![chess playground](https://i.imgur.com/Cv0hY2G.png)
+
+Want to give it a try ? Have fun [here !](https://dashboard.heroku.com/apps/boiling-peak-3929) 
+
+
